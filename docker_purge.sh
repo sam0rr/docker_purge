@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
 ################################################################################
-# docker-purge.sh — Docker environment cleanup and optimization tool
-# * Works with: curl -fsSL <url> | bash (using /dev/tty for input)
-# * Works with: ./docker-purge.sh
-# * Works with: bash docker-purge.sh
-# * Supports: --no-confirm (Skip interactive prompts)
-# * Supports: --force (Stop ALL running containers before purging)
+# DOCKER PURGE - Optimization and Cleanup Tool
+#
+# A bash script to analyze and reclaim Docker disk space.
+#
+# Author:  Samorr
+# GitHub:  https://github.com/sam0rr/docker_purge
+# License: MIT
+# Version: 1.1.0
+#
+# Usage:
+#   curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash -s -- [OPTIONS]
 ################################################################################
 
 # Configuration
@@ -251,7 +256,7 @@ show_help() {
 	label "  curl -fsSL ${GITHUB_URL} | bash"
 	newline
 	info "# Run directly from GitHub (With arguments)"
-	label "  bash <(curl -fsSL ${GITHUB_URL}) --force --no-confirm"
+	label "  curl -fsSL ${GITHUB_URL} | bash -s -- --force --no-confirm"
 	newline
 }
 

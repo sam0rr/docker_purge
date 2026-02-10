@@ -10,6 +10,7 @@ A Docker environment cleanup and optimization tool written in Bash. This script 
 - **Full Pruning**: Cleans stopped containers, all images (not just dangling), unused networks, and all build caches.
 - **Volume Cleanup**: Removes all unused volumes to reclaim maximum space.
 - **Zero Dependencies**: Optimized for portability; works on Arch Linux, Debian, Ubuntu, etc.
+- **Terminal Portability**: Uses `tput` for robust terminal styling across Linux and macOS.
 - **Hard Reset Mode**: Can stop all running containers before purging with the `--force` flag.
 - **Interactive Support**: Works seamlessly when piped from `curl` by using `/dev/tty`.
 
@@ -41,7 +42,7 @@ curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_pur
 **With arguments:**
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh) --force --no-confirm
+curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash -s -- --force --no-confirm
 ```
 
 ### 2. Install as a system command
@@ -102,8 +103,8 @@ EXAMPLES:
   # Hard reset (Stop all and purge without asking)
   docker-purge --force --no-confirm
 
-  # Run via curl (piped with arguments)
-  bash <(curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh) --force --no-confirm
+  # Run via curl (with arguments)
+  curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash -s -- --force --no-confirm
 ```
 
 ---
