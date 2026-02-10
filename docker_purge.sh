@@ -117,7 +117,7 @@ show_help() {
 	info "# Hard reset (Stop all and purge without asking)"
 	label "  docker-purge --force --no-confirm"
 	newline
-	info "# Run via curl (piped)"
+	info "# ---- Run via curl (piped) -----------------------------------------------------"
 	label "  curl -fsSL https://raw.githubusercontent.com/sam0rr/DOCKER-PURGE/main/docker_purge.sh | bash"
 	newline
 }
