@@ -208,31 +208,33 @@ validate_requirements() {
 
 # Convert byte values into human-readable strings (KB, MB, GB, etc.)
 format_bytes() {
-	printf "%s" "${1}" | awk '{
-        split("B KB MB GB TB PB", unit, " ");
-        i=1;
-        while($1>=1024 && i<6) {
-            $1/=1024;
-            i++;
-        }
-        printf "%.2f %s", $1, unit[i];
-    }'
+	printf "%s" "${1}" | LC_ALL=C awk '{
+		split("B KB MB GB TB PB", unit, " ");
+		i=1;
+		while($1>=1024 && i<6) {
+			$1/=1024;
+			i++;
+		}
+		printf "%.2f %s", $1, unit[i];
+	}'
 }
 
 # Calculate the total disk usage of all Docker resources in bytes
 get_docker_usage() {
-	docker system df --format "{{.Size}}" | awk '
-        function to_bytes(s) {
-            mult=1
-            if (s ~ /[Gg][Bb]/) mult=1024*1024*1024
-            else if (s ~ /[Mm][Bb]/) mult=1024*1024
-            else if (s ~ /[Kk][Bb]/) mult=1024
-            gsub(/[A-Za-z]/, "", s)
-            return s * mult
-        }
-        { sum += to_bytes($1) }
-        END { printf "%.0f", sum }
-    '
+	LC_ALL=C docker system df --format "{{.Size}}" | LC_ALL=C awk '
+		function to_bytes(s,    n, m) {
+			n = s; gsub(/[^0-9.]/, "", n)
+			if (!n) return 0
+			m = 1
+			if (s ~ /[Tt][Ii]?[Bb]/) m = 1024^4
+			else if (s ~ /[Gg][Ii]?[Bb]/) m = 1024^3
+			else if (s ~ /[Mm][Ii]?[Bb]/) m = 1024^2
+			else if (s ~ /[Kk][Ii]?[Bb]/) m = 1024^1
+			return n * m
+		}
+		{ sum += to_bytes($0) }
+		END { printf "%.0f", sum }
+	'
 }
 
 # Ask for user confirmation
