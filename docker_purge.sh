@@ -75,33 +75,74 @@ else
 fi
 
 # Logging helpers
-log() { echo -e "$(date '+%F %T') | ${*}" >&2; }
-info() { echo -e "${IBlue}${*}${NC}" >&2; }
-success() { echo -e "${BGreen}${*}${NC}" >&2; }
-warning() { echo -e "${BYellow}${*}${NC}" >&2; }
-error() { echo -e "${BRed}[ERROR] ${*}${NC}" >&2; }
+newline() { printf '\n' >&2; }
+log() {
+	printf "$(date '+%F %T') | %b" "${*}" >&2
+	newline
+}
+info() {
+	printf "${IBlue}%b${NC}" "${*}" >&2
+	newline
+}
+success() {
+	printf "${BGreen}%b${NC}" "${*}" >&2
+	newline
+}
+warning() {
+	printf "${BYellow}%b${NC}" "${*}" >&2
+	newline
+}
+error() {
+	printf "${BRed}[ERROR] %b${NC}" "${*}" >&2
+	newline
+}
 fatal() {
-	echo -e "${BIRed}[FATAL] ${*}${NC}" >&2
+	printf "${BIRed}[FATAL] %b${NC}" "${*}" >&2
+	newline
 	exit 1
 }
-debug() { echo -e "${BIYellow}[DEBUG] ${*}${NC}" >&2; }
+debug() {
+	printf "${BIYellow}[DEBUG] %b${NC}" "${*}" >&2
+	newline
+}
 
 # Formatting helpers
-title() { echo -e "${BICyan}${*}${NC}" >&2; }
-subtitle() { echo -e "${BBlue}${*}${NC}" >&2; }
-label() { echo -e "${IWhite}${*}${NC}"; }
-newline() { printf '\n' >&2; }
-header() {
-	echo -e "${BIBlue}
-  ###########################################################
-  # "${@}"
-  ###########################################################
-  ${NC}" >&2
+title() {
+	printf "${BICyan}%b${NC}" "${*}" >&2
+	newline
 }
-bullet() { echo -e "   ${Red}•${NC} ${IWhite}${*}${NC}" >&2; }
-bullet_warn() { echo -e "   ${BIRed}• ${*}${NC}" >&2; }
-option() { printf "  ${Cyan}%-18s${NC} ${IWhite}%s${NC}\n" "${1}" "${2}" >&2; }
-key_value() { printf "   ${IWhite}%-18s${NC} %b\n" "${1}" "${2}" >&2; }
+subtitle() {
+	printf "${BBlue}%b${NC}" "${*}" >&2
+	newline
+}
+label() {
+	printf "${IWhite}%b${NC}" "${*}" >&2
+	newline
+}
+header() {
+	printf "${BIBlue}
+  ###########################################################
+  # %b
+  ###########################################################
+  ${NC}" "${*}" >&2
+	newline
+}
+bullet() {
+	printf "   ${Red}•${NC} ${IWhite}%b${NC}" "${*}" >&2
+	newline
+}
+bullet_warn() {
+	printf "   ${BIRed}• %b${NC}" "${*}" >&2
+	newline
+}
+option() {
+	printf "  ${Cyan}%-18s${NC} ${IWhite}%s${NC}" "${1}" "${2}" >&2
+	newline
+}
+key_value() {
+	printf "   ${IWhite}%-18s${NC} %b" "${1}" "${2}" >&2
+	newline
+}
 
 # Display the application usage guide and help message
 show_help() {
@@ -166,7 +207,7 @@ validate_requirements() {
 
 # Convert byte values into human-readable strings (KB, MB, GB, etc.)
 format_bytes() {
-	echo "${1}" | awk '{
+	printf "%s" "${1}" | awk '{
         split("B KB MB GB TB PB", unit, " ");
         i=1;
         while($1>=1024 && i<6) {
@@ -220,21 +261,21 @@ confirm_purge() {
 	while true; do
 		printf "${BYellow}Do you want to proceed? (y/N): ${NC}" >&2
 		read -r choice </dev/tty
-		choice=$(echo "${choice}" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+		choice=$(printf "%s" "${choice}" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
 
 		case "${choice}" in
-			y) return 0 ;;
-			n|"")
-				newline
-				info "Purge cancelled by user."
-				newline
-				return 1
-				;;
-			*)
-				newline
-				error "Invalid choice: '${choice}'. Please enter 'y' or 'n'."
-				newline
-				;;
+		y) return 0 ;;
+		n | "")
+			newline
+			info "Purge cancelled by user."
+			newline
+			return 1
+			;;
+		*)
+			newline
+			error "Invalid choice: '${choice}'. Please enter 'y' or 'n'."
+			newline
+			;;
 		esac
 	done
 }
@@ -319,6 +360,7 @@ main() {
 		display_summary "${initial_usage}" "${final_usage}"
 		success "Operation completed successfully"
 	fi
+
 	exit 0
 }
 
