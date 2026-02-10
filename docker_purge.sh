@@ -238,7 +238,8 @@ confirm_purge() {
 	local force_mode="${2}"
 
 	if [[ "${no_confirm}" == "true" ]]; then
-		info "Running in non-interactive mode (--no-confirm detected)"
+		newline
+		warning "Running in non-interactive mode (--no-confirm detected)"
 		return 0
 	fi
 
