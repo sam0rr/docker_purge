@@ -35,10 +35,9 @@ curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_pur
 1. Download to `/usr/local/bin`:
 
    ```bash
-   sudo curl -fsSL \
-       https://raw.githubusercontent.com/sam0rr/DOCKER-PURGE/main/docker_purge.sh \
-       -o /usr/local/bin/docker-purge
-   ```
+       sudo curl -fsSL \
+           https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh \
+           -o /usr/local/bin/docker-purge   ```
 2. Make executable:
 
    ```bash

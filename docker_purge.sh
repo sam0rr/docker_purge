@@ -252,11 +252,8 @@ display_summary() {
 	subtitle "==========================================================="
 }
 
-#  main
-main() {
-	local no_confirm=false
-	local force_mode=false
-
+# Parse command-line arguments and set flags
+parse_args() {
 	for arg in "${@}"; do
 		case ${arg} in
 		-h | --help)
@@ -272,6 +269,14 @@ main() {
 			;;
 		esac
 	done
+}
+
+# main
+main() {
+	local no_confirm=false
+	local force_mode=false
+
+	parse_args "${@}"
 
 	newline
 	header "${APP_NAME} - Optimization Tool"
