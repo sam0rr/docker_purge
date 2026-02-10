@@ -4,17 +4,17 @@ A Docker environment cleanup and optimization tool written in Bash. This script 
 
 ## Features
 
-* **Usage Analysis**: Calculates Docker disk usage before and after cleanup using standard tools.
-* **Full Pruning**: Cleans stopped containers, all images (not just dangling), unused networks, and all build caches.
-* **Volume Cleanup**: Removes all unused volumes to reclaim maximum space.
-* **Zero Dependencies**: Optimized for portability; works on Arch Linux, Debian, Ubuntu, etc. (No `bc` required).
-* **Hard Reset Mode**: Can stop all running containers before purging with the `--force` flag.
-* **Interactive Support**: Works seamlessly when piped from `curl` by using `/dev/tty`.
+- **Usage Analysis**: Calculates Docker disk usage before and after cleanup using standard tools.
+- **Full Pruning**: Cleans stopped containers, all images (not just dangling), unused networks, and all build caches.
+- **Volume Cleanup**: Removes all unused volumes to reclaim maximum space.
+- **Zero Dependencies**: Optimized for portability; works on Arch Linux, Debian, Ubuntu, etc. (No `bc` required).
+- **Hard Reset Mode**: Can stop all running containers before purging with the `--force` flag.
+- **Interactive Support**: Works seamlessly when piped from `curl` by using `/dev/tty`.
 
 ## Prerequisites
 
-* `bash` (version 4+)
-* `docker` (installed and running)
+- `bash` (version 4+)
+- `docker` (installed and running)
 
 Ensure your user has permissions to run Docker commands without `sudo`, or run the script with appropriate privileges.
 
@@ -22,27 +22,38 @@ Ensure your user has permissions to run Docker commands without `sudo`, or run t
 
 Choose one of the following methods:
 
-### 1. One‑line curl + bash
+### 1. One‑line execution (curl)
 
-*Downloads and executes the script without saving it locally.*
+_Downloads and executes the script. Use the following syntax to pass arguments:_
+
+**Standard interactive cleanup:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash
+```
+
+**With arguments:**
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh) --force --no-confirm
 ```
 
 ### 2. Install as a system command
 
 1. Download to `/usr/local/bin`:
 
-   ```bash
+   ````bash
        sudo curl -fsSL \
            https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh \
            -o /usr/local/bin/docker-purge   ```
+   ````
+
 2. Make executable:
 
    ```bash
    sudo chmod +x /usr/local/bin/docker-purge
    ```
+
 3. Run it directly:
 
    ```bash
@@ -54,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_pur
 1. **validate_requirements**: Ensures `docker` is available and the daemon is reachable.
 2. **get_docker_usage**: Uses `docker system df` and `awk` to calculate total byte usage.
 3. **confirm_purge**: Provides a warning and asks for user confirmation.
-4. **perform_cleanup**: 
+4. **perform_cleanup**:
    - Stops all running containers if `--force` is used.
    - Sequentially executes `builder prune`, `container prune`, `image prune`, `volume prune`, and a final `system prune`.
 5. **display_summary**: Compares pre and post usage, formatting the results into a clean, colored report.
@@ -81,14 +92,14 @@ EXAMPLES:
   # Hard reset (Stop all and purge without asking)
   docker-purge --force --no-confirm
 
-  # Run via curl (piped)
-  curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash
+  # Run via curl (piped with arguments)
+  bash <(curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh) --force --no-confirm
 ```
 
 ## Arguments
 
-* `--no-confirm`: Skip interactive prompts (useful for automation).
-* `--force`: Stop all currently running containers before starting the cleanup.
+- `--no-confirm`: Skip interactive prompts (useful for automation).
+- `--force`: Stop all currently running containers before starting the cleanup.
 
 ## License
 

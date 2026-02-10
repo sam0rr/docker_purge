@@ -247,8 +247,11 @@ show_help() {
 	info "# Hard reset (Stop all and purge without asking)"
 	label "  docker-purge --force --no-confirm"
 	newline
-	info "# Run the script directly from GitHub via curl"
+	info "# Run directly from GitHub (Interactive)"
 	label "  curl -fsSL ${GITHUB_URL} | bash"
+	newline
+	info "# Run directly from GitHub (With arguments)"
+	label "  bash <(curl -fsSL ${GITHUB_URL}) --force --no-confirm"
 	newline
 }
 
