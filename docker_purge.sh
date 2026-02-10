@@ -103,17 +103,23 @@ bullet_warn() { echo -e "   ${BIRed}• ${*}${NC}" >&2; }
 option() { printf "  ${Cyan}%-18s${NC} ${IWhite}%s${NC}\n" "${1}" "${2}" >&2; }
 key_value() { printf "   ${IWhite}%-18s${NC} %b\n" "${1}" "${2}" >&2; }
 
-# Convert byte values into human-readable strings (KB, MB, GB, etc.)
-format_bytes() {
-	echo "${1}" | awk '{
-        split("B KB MB GB TB PB", unit, " ");
-        i=1;
-        while($1>=1024 && i<6) {
-            $1/=1024;
-            i++;
-        }
-        printf "%.2f %s", $1, unit[i];
-    }'
+# Parse command-line arguments and set flags
+parse_args() {
+	for arg in "${@}"; do
+		case ${arg} in
+		-h | --help)
+			show_help
+			exit 0
+			;;
+		--no-confirm) no_confirm=true ;;
+		--force) force_mode=true ;;
+		*)
+			error "Unknown option: ${arg}"
+			show_help
+			exit 1
+			;;
+		esac
+	done
 }
 
 # Validate required dependencies
@@ -125,6 +131,45 @@ validate_requirements() {
 	if ! docker info >/dev/null 2>&1; then
 		fatal "Cannot connect to Docker daemon. Is it running?"
 	fi
+}
+
+# Display the application usage guide and help message
+show_help() {
+	header "${APP_NAME} — Usage Guide"
+	subtitle "USAGE:"
+	label "  docker-purge [OPTIONS]"
+	newline
+	subtitle "OPTIONS:"
+	option "-h, --help" "Show this help message and exit"
+	option "--no-confirm" "Skip interactive confirmation prompts"
+	option "--force" "Stop all running containers before purging"
+	newline
+	subtitle "EXAMPLES:"
+	info "# Standard interactive cleanup"
+	label "  docker-purge"
+	newline
+	info "# Hard reset (Stop all and purge without asking)"
+	label "  docker-purge --force --no-confirm"
+	newline
+	info "# Run directly from GitHub (Interactive)"
+	label "  curl -fsSL ${GITHUB_URL} | bash"
+	newline
+	info "# Run directly from GitHub (With arguments)"
+	label "  curl -fsSL ${GITHUB_URL} | bash -s -- --force --no-confirm"
+	newline
+}
+
+# Convert byte values into human-readable strings (KB, MB, GB, etc.)
+format_bytes() {
+	echo "${1}" | awk '{
+        split("B KB MB GB TB PB", unit, " ");
+        i=1;
+        while($1>=1024 && i<6) {
+            $1/=1024;
+            i++;
+        }
+        printf "%.2f %s", $1, unit[i];
+    }'
 }
 
 # Calculate the total disk usage of all Docker resources in bytes
@@ -231,52 +276,6 @@ display_summary() {
 	printf "   ${IWhite}%-18s${NC} " "Status" >&2
 	success "Docker environment optimized and clean"
 	newline
-	subtitle "==========================================================="
-}
-
-# Display the application usage guide and help message
-show_help() {
-	header "${APP_NAME} — Usage Guide"
-	subtitle "USAGE:"
-	label "  docker-purge [OPTIONS]"
-	newline
-	subtitle "OPTIONS:"
-	option "-h, --help" "Show this help message and exit"
-	option "--no-confirm" "Skip interactive confirmation prompts"
-	option "--force" "Stop all running containers before purging"
-	newline
-	subtitle "EXAMPLES:"
-	info "# Standard interactive cleanup"
-	label "  docker-purge"
-	newline
-	info "# Hard reset (Stop all and purge without asking)"
-	label "  docker-purge --force --no-confirm"
-	newline
-	info "# Run directly from GitHub (Interactive)"
-	label "  curl -fsSL ${GITHUB_URL} | bash"
-	newline
-	info "# Run directly from GitHub (With arguments)"
-	label "  curl -fsSL ${GITHUB_URL} | bash -s -- --force --no-confirm"
-	newline
-}
-
-# Parse command-line arguments and set flags
-parse_args() {
-	for arg in "${@}"; do
-		case ${arg} in
-		-h | --help)
-			show_help
-			exit 0
-			;;
-		--no-confirm) no_confirm=true ;;
-		--force) force_mode=true ;;
-		*)
-			error "Unknown option: ${arg}"
-			show_help
-			exit 1
-			;;
-		esac
-	done
 }
 
 # main

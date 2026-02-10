@@ -49,23 +49,23 @@ curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_pur
 
 1. Download to `/usr/local/bin`:
 
-   ````bash
-       sudo curl -fsSL \
-           https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh \
-           -o /usr/local/bin/docker-purge   ```
-   ````
+```bash
+sudo curl -fsSL \
+   https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh \
+   -o /usr/local/bin/docker-purge
+```
 
 2. Make executable:
 
-   ```bash
-   sudo chmod +x /usr/local/bin/docker-purge
-   ```
+```bash
+sudo chmod +x /usr/local/bin/docker-purge
+```
 
 3. Run it directly:
 
-   ```bash
-   docker-purge
-   ```
+```bash
+docker-purge
+```
 
 ---
 
@@ -84,28 +84,6 @@ curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_pur
 ## CLI Usage
 
 You can view the help message by running `docker-purge --help`:
-
-```text
-DOCKER PURGE — Usage Guide
-
-USAGE:
-  docker-purge [OPTIONS]
-
-OPTIONS:
-  -h, --help         Show this help message and exit
-  --no-confirm      Skip interactive confirmation prompts
-  --force           Stop all running containers before purging
-
-EXAMPLES:
-  # Standard interactive cleanup
-  docker-purge
-
-  # Hard reset (Stop all and purge without asking)
-  docker-purge --force --no-confirm
-
-  # Run via curl (with arguments)
-  curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash -s -- --force --no-confirm
-```
 
 ---
 
