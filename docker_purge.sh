@@ -111,29 +111,6 @@ format_bytes() {
     }'
 }
 
-# Display the application usage guide and help message
-show_help() {
-	header "${APP_NAME} — Usage Guide"
-	subtitle "USAGE:"
-	label "  docker-purge [OPTIONS]"
-	newline
-	subtitle "OPTIONS:"
-	option "-h, --help" "Show this help message and exit"
-	option "--no-confirm" "Skip interactive confirmation prompts"
-	option "--force" "Stop all running containers before purging"
-	newline
-	subtitle "EXAMPLES:"
-	info "# Standard interactive cleanup"
-	label "  docker-purge"
-	newline
-	info "# Hard reset (Stop all and purge without asking)"
-	label "  docker-purge --force --no-confirm"
-	newline
-	info "# Run the script directly from GitHub via curl"
-	label "  curl -fsSL ${GITHUB_URL} | bash"
-	newline
-}
-
 # Validate required dependencies
 validate_requirements() {
 	if ! command -v docker >/dev/null 2>&1; then
@@ -252,6 +229,29 @@ display_summary() {
 	subtitle "==========================================================="
 }
 
+# Display the application usage guide and help message
+show_help() {
+	header "${APP_NAME} — Usage Guide"
+	subtitle "USAGE:"
+	label "  docker-purge [OPTIONS]"
+	newline
+	subtitle "OPTIONS:"
+	option "-h, --help" "Show this help message and exit"
+	option "--no-confirm" "Skip interactive confirmation prompts"
+	option "--force" "Stop all running containers before purging"
+	newline
+	subtitle "EXAMPLES:"
+	info "# Standard interactive cleanup"
+	label "  docker-purge"
+	newline
+	info "# Hard reset (Stop all and purge without asking)"
+	label "  docker-purge --force --no-confirm"
+	newline
+	info "# Run the script directly from GitHub via curl"
+	label "  curl -fsSL ${GITHUB_URL} | bash"
+	newline
+}
+
 # Parse command-line arguments and set flags
 parse_args() {
 	for arg in "${@}"; do
@@ -273,8 +273,8 @@ parse_args() {
 
 # main
 main() {
-	local no_confirm=false
-	local force_mode=false
+	no_confirm=false
+	force_mode=false
 
 	parse_args "${@}"
 
