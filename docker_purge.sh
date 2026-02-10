@@ -289,7 +289,7 @@ main() {
 		local final_usage=$(get_docker_usage)
 
 		display_summary "${initial_usage}" "${final_usage}"
-		success "Operation completed successfully!"
+		success "Operation completed successfully"
 	fi
 
 	newline
