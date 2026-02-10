@@ -79,12 +79,12 @@ log() { echo -e "$(date '+%F %T') | ${*}" >&2; }
 info() { echo -e "${IBlue}${*}${NC}" >&2; }
 success() { echo -e "${BGreen}${*}${NC}" >&2; }
 warning() { echo -e "${BYellow}${*}${NC}" >&2; }
-error() { echo -e "\n${BRed}[ERROR] ${*}${NC}" >&2; }
+error() { echo -e "${BRed}[ERROR] ${*}${NC}" >&2; }
 fatal() {
-	echo -e "\n${BIRed}[FATAL] ${*}${NC}" >&2
+	echo -e "${BIRed}[FATAL] ${*}${NC}" >&2
 	exit 1
 }
-debug() { echo -e "\n${BIYellow}[DEBUG] ${*}${NC}" >&2; }
+debug() { echo -e "${BIYellow}[DEBUG] ${*}${NC}" >&2; }
 
 # Formatting helpers
 title() { echo -e "${BICyan}${*}${NC}" >&2; }
@@ -102,36 +102,6 @@ bullet() { echo -e "   ${Red}•${NC} ${IWhite}${*}${NC}" >&2; }
 bullet_warn() { echo -e "   ${BIRed}• ${*}${NC}" >&2; }
 option() { printf "  ${Cyan}%-18s${NC} ${IWhite}%s${NC}\n" "${1}" "${2}" >&2; }
 key_value() { printf "   ${IWhite}%-18s${NC} %b\n" "${1}" "${2}" >&2; }
-
-# Parse command-line arguments and set flags
-parse_args() {
-	for arg in "${@}"; do
-		case ${arg} in
-		-h | --help)
-			show_help
-			exit 0
-			;;
-		--no-confirm) no_confirm=true ;;
-		--force) force_mode=true ;;
-		*)
-			error "Unknown option: ${arg}"
-			show_help
-			exit 1
-			;;
-		esac
-	done
-}
-
-# Validate required dependencies
-validate_requirements() {
-	if ! command -v docker >/dev/null 2>&1; then
-		fatal "Docker is not installed. Please install Docker first."
-	fi
-
-	if ! docker info >/dev/null 2>&1; then
-		fatal "Cannot connect to Docker daemon. Is it running?"
-	fi
-}
 
 # Display the application usage guide and help message
 show_help() {
@@ -157,6 +127,41 @@ show_help() {
 	info "# Run directly from GitHub (With arguments)"
 	label "  curl -fsSL ${GITHUB_URL} | bash -s -- --force --no-confirm"
 	newline
+}
+
+# Parse command-line arguments and set flags
+parse_args() {
+	for arg in "${@}"; do
+		case ${arg} in
+		-h | --help)
+			show_help
+			exit 0
+			;;
+		--no-confirm) no_confirm=true ;;
+		--force) force_mode=true ;;
+		*)
+			newline
+			error "Unknown option: ${arg}"
+			show_help
+			exit 1
+			;;
+		esac
+	done
+}
+
+# Validate required dependencies
+validate_requirements() {
+	if ! command -v docker >/dev/null 2>&1; then
+		newline
+		fatal "Docker is not installed. Please install Docker first."
+		newline
+	fi
+
+	if ! docker info >/dev/null 2>&1; then
+		newline
+		fatal "Cannot connect to Docker daemon. Is it running?"
+		newline
+	fi
 }
 
 # Convert byte values into human-readable strings (KB, MB, GB, etc.)
@@ -217,9 +222,20 @@ confirm_purge() {
 		read -r choice </dev/tty
 		choice=$(echo "${choice}" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
 
-		if [[ "${choice}" == "y" ]]; then return 0; fi
-		info "Purge cancelled by user."
-		return 1
+		case "${choice}" in
+			y) return 0 ;;
+			n|"")
+				newline
+				info "Purge cancelled by user."
+				newline
+				return 1
+				;;
+			*)
+				newline
+				error "Invalid choice: '${choice}'. Please enter 'y' or 'n'."
+				newline
+				;;
+		esac
 	done
 }
 
@@ -303,8 +319,6 @@ main() {
 		display_summary "${initial_usage}" "${final_usage}"
 		success "Operation completed successfully"
 	fi
-
-	newline
 	exit 0
 }
 
