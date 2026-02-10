@@ -242,19 +242,17 @@ confirm_purge() {
 		warning "Running in non-interactive mode (--no-confirm detected)"
 		return 0
 	fi
-
 	newline
 	warning "ATTENTION: This will permanently delete:"
+	newline
+	if [[ "${force_mode}" == "true" ]]; then
+		bullet_warn "ALL RUNNING CONTAINERS WILL BE STOPPED (--force active)"
+	fi
 	bullet "All stopped containers"
 	bullet "All unused networks"
 	bullet "All unused images"
 	bullet "All build cache"
 	bullet "All unused volumes"
-
-	if [[ "${force_mode}" == "true" ]]; then
-		newline
-		bullet_warn "ALL RUNNING CONTAINERS WILL BE STOPPED (--force active)"
-	fi
 	newline
 
 	while true; do
