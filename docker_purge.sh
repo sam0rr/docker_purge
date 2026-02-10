@@ -151,7 +151,7 @@ key_value() {
 show_help() {
 	header "${APP_NAME} — Usage Guide"
 	title "USAGE:"
-	label "  docker-purge [OPTIONS]"
+	label "  docker_purge [OPTIONS]"
 	newline
 	title "OPTIONS:"
 	option "-h, --help" "Show this help message and exit"
@@ -160,10 +160,10 @@ show_help() {
 	newline
 	title "EXAMPLES:"
 	info "# Standard interactive cleanup"
-	label "  docker-purge"
+	label "  docker_purge"
 	newline
 	info "# Hard reset (Stop all and purge without asking)"
-	label "  docker-purge --force --no-confirm"
+	label "  docker_purge --force --no-confirm"
 	newline
 	info "# Run directly from GitHub (Interactive)"
 	label "  curl -fsSL ${GITHUB_URL} | bash"
