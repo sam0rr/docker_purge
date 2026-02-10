@@ -1,63 +1,73 @@
 #!/usr/bin/env bash
 
-###############################################################################
+################################################################################
 # docker-purge.sh — Docker environment cleanup and optimization tool
-# • Works with: curl -fsSL <url> | bash (using /dev/tty for input)
-# • Works with: ./docker-purge.sh
-# • Works with: bash docker-purge.sh
-# • Supports: --no-confirm (Skip interactive prompts)
-# • Supports: --force (Stop ALL running containers before purging)
-###############################################################################
+# * Works with: curl -fsSL <url> | bash (using /dev/tty for input)
+# * Works with: ./docker-purge.sh
+# * Works with: bash docker-purge.sh
+# * Supports: --no-confirm (Skip interactive prompts)
+# * Supports: --force (Stop ALL running containers before purging)
+################################################################################
 
-# ── Configuration ─────────────────────────────────────────────────────────────
+# ---- Configuration -----------------------------------------------------------
 readonly APP_NAME="DOCKER PURGE"
 
-# ── Color definitions ─────────────────────────────────────────────────────────
-readonly NC='\033[0m'
-readonly BOLD='\033[1m'
-readonly DIM='\033[2m'
+# ---- Color definitions -------------------------------------------------------
+_tput() { command -v tput >/dev/null 2>&1 && tput "$@" 2>/dev/null; }
 
-# Regular Colors
-readonly Black="${NC}\033[0;30m"
-readonly Red="${NC}\033[0;31m"
-readonly Green="${NC}\033[0;32m"
-readonly Yellow="${NC}\033[0;33m"
-readonly Blue="${NC}\033[0;34m"
-readonly Purple="${NC}\033[0;35m"
-readonly Cyan="${NC}\033[0;36m"
-readonly White="${NC}\033[0;37m"
+# Only define colors if the terminal supports them
+if [[ $(_tput colors) -ge 8 ]]; then
+	readonly NC=$(_tput sgr0)
+	readonly BOLD=$(_tput bold)
 
-# Bold
-readonly BBlack="${NC}\033[1;30m"
-readonly BRed="${NC}\033[1;31m"
-readonly BGreen="${NC}\033[1;32m"
-readonly BYellow="${NC}\033[1;33m"
-readonly BBlue="${NC}\033[1;34m"
-readonly BPurple="${NC}\033[1;35m"
-readonly BCyan="${NC}\033[1;36m"
-readonly BWhite="${NC}\033[1;37m"
+	# Regular Colors
+	readonly Black="${NC}$(_tput setaf 0)"
+	readonly Red="${NC}$(_tput setaf 1)"
+	readonly Green="${NC}$(_tput setaf 2)"
+	readonly Yellow="${NC}$(_tput setaf 3)"
+	readonly Blue="${NC}$(_tput setaf 4)"
+	readonly Purple="${NC}$(_tput setaf 5)"
+	readonly Cyan="${NC}$(_tput setaf 6)"
+	readonly White="${NC}$(_tput setaf 7)"
 
-# High Intensity
-readonly IBlack="${NC}\033[0;90m"
-readonly IRed="${NC}\033[0;91m"
-readonly IGreen="${NC}\033[0;92m"
-readonly IYellow="${NC}\033[0;93m"
-readonly IBlue="${NC}\033[0;94m"
-readonly IPurple="${NC}\033[0;95m"
-readonly ICyan="${NC}\033[0;96m"
-readonly IWhite="${NC}\033[0;97m"
+	# Bold Colors
+	readonly BBlack="${NC}${BOLD}$(_tput setaf 0)"
+	readonly BRed="${NC}${BOLD}$(_tput setaf 1)"
+	readonly BGreen="${NC}${BOLD}$(_tput setaf 2)"
+	readonly BYellow="${NC}${BOLD}$(_tput setaf 3)"
+	readonly BBlue="${NC}${BOLD}$(_tput setaf 4)"
+	readonly BPurple="${NC}${BOLD}$(_tput setaf 5)"
+	readonly BCyan="${NC}${BOLD}$(_tput setaf 6)"
+	readonly BWhite="${NC}${BOLD}$(_tput setaf 7)"
 
-# Bold High Intensity
-readonly BIBlack="${NC}\033[1;90m"
-readonly BIRed="${NC}\033[1;91m"
-readonly BIGreen="${NC}\033[1;92m"
-readonly BIYellow="${NC}\033[1;93m"
-readonly BIBlue="${NC}\033[1;94m"
-readonly BIPurple="${NC}\033[1;95m"
-readonly BICyan="${NC}\033[1;96m"
-readonly BIWhite="${NC}\033[1;97m"
+	# High Intensity Colors
+	readonly IBlack="${NC}$(_tput setaf 8)"
+	readonly IRed="${NC}$(_tput setaf 9)"
+	readonly IGreen="${NC}$(_tput setaf 10)"
+	readonly IYellow="${NC}$(_tput setaf 11)"
+	readonly IBlue="${NC}$(_tput setaf 12)"
+	readonly IPurple="${NC}$(_tput setaf 13)"
+	readonly ICyan="${NC}$(_tput setaf 14)"
+	readonly IWhite="${NC}$(_tput setaf 15)"
 
-# ── 1. General Logging Utilities ──────────────────────────────────────────────
+	# Bold High Intensity Colors
+	readonly BIBlack="${NC}${BOLD}$(_tput setaf 8)"
+	readonly BIRed="${NC}${BOLD}$(_tput setaf 9)"
+	readonly BIGreen="${NC}${BOLD}$(_tput setaf 10)"
+	readonly BIYellow="${NC}${BOLD}$(_tput setaf 11)"
+	readonly BIBlue="${NC}${BOLD}$(_tput setaf 12)"
+	readonly BIPurple="${NC}${BOLD}$(_tput setaf 13)"
+	readonly BICyan="${NC}${BOLD}$(_tput setaf 14)"
+	readonly BIWhite="${NC}${BOLD}$(_tput setaf 15)"
+else
+	readonly NC='' BOLD=''
+	readonly Black='' Red='' Green='' Yellow='' Blue='' Purple='' Cyan='' White=''
+	readonly BBlack='' BRed='' BGreen='' BYellow='' BBlue='' BPurple='' BCyan='' BWhite=''
+	readonly IBlack='' IRed='' IGreen='' IYellow='' IBlue='' IPurple='' ICyan='' IWhite=''
+	readonly BIBlack='' BIRed='' BIGreen='' BIYellow='' BIBlue='' BIPurple='' BICyan='' BIWhite=''
+fi
+
+# ---- Logging helpers -------------------------------------------------------------
 log() { echo -e "$(date '+%F %T') | ${*}" >&2; }
 info() { echo -e "${IBlue}${*}${NC}" >&2; }
 success() { echo -e "${BGreen}${*}${NC}" >&2; }
@@ -69,7 +79,7 @@ fatal() {
 }
 debug() { echo -e "\n${BIYellow}[DEBUG] ${*}${NC}" >&2; }
 
-# ── 2. UI & Formatting Helpers ────────────────────────────────────────────────
+# ---- Formatting helpers -------------------------------------------------------------
 title() { echo -e "${BICyan}${*}${NC}" >&2; }
 subtitle() { echo -e "${BBlue}${*}${NC}" >&2; }
 label() { echo -e "${IWhite}${*}${NC}"; }
@@ -86,7 +96,7 @@ bullet_warn() { echo -e "   ${BIRed}• ${*}${NC}" >&2; }
 option() { printf "  ${Cyan}%-18s${NC} ${IWhite}%s${NC}\n" "${1}" "${2}" >&2; }
 key_value() { printf "   ${IWhite}%-18s${NC} %b\n" "${1}" "${2}" >&2; }
 
-# ── 3. Data & Calculation Utilities ───────────────────────────────────────────
+# ---- format_bytes ------------------------------------------------------------
 format_bytes() {
 	echo "${1}" | awk '{
         split("B KB MB GB TB PB", unit, " ");
@@ -99,7 +109,7 @@ format_bytes() {
     }'
 }
 
-# ── 4. Information & Help ─────────────────────────────────────────────────────
+# ---- show_help ---------------------------------------------------------------
 show_help() {
 	header "${APP_NAME} — Usage Guide"
 	subtitle "USAGE:"
@@ -122,7 +132,7 @@ show_help() {
 	newline
 }
 
-# ── 5. Domain Logic Functions ─────────────────────────────────────────────────
+# ---- validate_requirements ---------------------------------------------------
 validate_requirements() {
 	if ! command -v docker >/dev/null 2>&1; then
 		fatal "Docker is not installed. Please install Docker first."
@@ -133,6 +143,7 @@ validate_requirements() {
 	fi
 }
 
+# ---- get_docker_usage --------------------------------------------------------
 get_docker_usage() {
 	docker system df --format "{{.Size}}" | awk '
         function to_bytes(s) {
@@ -148,6 +159,7 @@ get_docker_usage() {
     '
 }
 
+# ---- confirm_purge -----------------------------------------------------------
 confirm_purge() {
 	local no_confirm="${1}"
 	local force_mode="${2}"
@@ -182,6 +194,7 @@ confirm_purge() {
 	done
 }
 
+# ---- perform_cleanup ---------------------------------------------------------
 perform_cleanup() {
 	local force_mode="${1}"
 	subtitle "Cleanup Operations"
@@ -214,6 +227,7 @@ perform_cleanup() {
 	docker system prune --all --volumes --force >/dev/null
 }
 
+# ---- display_summary ---------------------------------------------------------
 display_summary() {
 	local initial_raw="${1}"
 	local final_raw="${2}"
@@ -236,7 +250,7 @@ display_summary() {
 	subtitle "==========================================================="
 }
 
-# ── 6. Controller (Main Entry Point) ──────────────────────────────────────────
+# ---- main --------------------------------------------------------------------
 main() {
 	local no_confirm=false
 	local force_mode=false
@@ -280,7 +294,7 @@ main() {
 	exit 0
 }
 
-# ── Trap & Execute ────────────────────────────────────────────────────────────
+# ---- Trap & Execute ----------------------------------------------------------
 trap 'newline; warning "Process interrupted."; exit 1' INT
 
 main "${@}"
