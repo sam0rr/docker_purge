@@ -14,6 +14,8 @@
 #   curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash -s -- [OPTIONS]
 ################################################################################
 
+set -Eeuo pipefail
+
 # Configuration
 readonly APP_NAME="DOCKER PURGE"
 readonly GITHUB_URL="https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh"
@@ -22,6 +24,7 @@ readonly GITHUB_URL="https://raw.githubusercontent.com/sam0rr/docker_purge/main/
 _tput() { command -v tput >/dev/null 2>&1 && tput "$@" 2>/dev/null; }
 
 # Initialize color variables
+# shellcheck disable=SC2155,SC2034
 if [[ $(_tput colors) -ge 8 ]]; then
 	readonly NC=$(_tput sgr0)
 	readonly BOLD=$(_tput bold)
@@ -108,11 +111,11 @@ debug() {
 
 # Formatting helpers
 title() {
-	printf "%b%b%b" "${BICyan}" "${*}" "${NC}" >&2
+	printf "%b%b%b" "${BBlue}" "${*}" "${NC}" >&2
 	newline
 }
 subtitle() {
-	printf "%b%b%b" "${BBlue}" "${*}" "${NC}" >&2
+	printf "%b%b%b" "${BICyan}" "${*}" "${NC}" >&2
 	newline
 }
 label() {
@@ -147,15 +150,15 @@ key_value() {
 # Display the application usage guide and help message
 show_help() {
 	header "${APP_NAME} — Usage Guide"
-	subtitle "USAGE:"
+	title "USAGE:"
 	label "  docker-purge [OPTIONS]"
 	newline
-	subtitle "OPTIONS:"
+	title "OPTIONS:"
 	option "-h, --help" "Show this help message and exit"
 	option "--no-confirm" "Skip interactive confirmation prompts"
 	option "--force" "Stop all running containers before purging"
 	newline
-	subtitle "EXAMPLES:"
+	title "EXAMPLES:"
 	info "# Standard interactive cleanup"
 	label "  docker-purge"
 	newline
@@ -284,10 +287,10 @@ perform_cleanup() {
 
 	if [[ "${force_mode}" == "true" ]]; then
 		local running_containers
-		running_containers=$(docker ps -q)
-		if [[ -n "${running_containers}" ]]; then
+		mapfile -t running_containers < <(docker ps -q)
+		if [[ ${#running_containers[@]} -gt 0 ]]; then
 			info "-> Stopping all running containers..."
-			docker stop ${running_containers} >/dev/null
+			docker stop "${running_containers[@]}" >/dev/null
 		else
 			info "-> No containers running."
 		fi
@@ -332,8 +335,8 @@ display_summary() {
 
 # main
 main() {
-	no_confirm=false
-	force_mode=false
+	local no_confirm=false
+	local force_mode=false
 
 	parse_args "${@}"
 
@@ -363,6 +366,6 @@ main() {
 }
 
 # Trap & Execute
-trap 'newline; warning "Process interrupted."; exit 1' INT
+trap 'newline; newline; warning "Process interrupted."; newline; exit 1' INT
 
 main "${@}"
