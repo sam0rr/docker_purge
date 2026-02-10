@@ -52,19 +52,19 @@ curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_pur
 ```bash
 sudo curl -fsSL \
    https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh \
-   -o /usr/local/bin/docker-purge
+   -o /usr/local/bin/docker_purge
 ```
 
 2. Make executable:
 
 ```bash
-sudo chmod +x /usr/local/bin/docker-purge
+sudo chmod +x /usr/local/bin/docker_purge
 ```
 
 3. Run it directly:
 
 ```bash
-docker-purge
+docker_purge
 ```
 
 ---
