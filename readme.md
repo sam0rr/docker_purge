@@ -83,7 +83,7 @@ docker_purge
 
 ## CLI Usage
 
-You can view the help message by running `docker-purge --help`:
+You can view the help message by running `docker_purge --help`:
 
 ---
 
