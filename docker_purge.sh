@@ -18,44 +18,44 @@ readonly BOLD='\033[1m'
 readonly DIM='\033[2m'
 
 # Regular Colors
-readonly Black='\033[0;30m'
-readonly Red='\033[0;31m'
-readonly Green='\033[0;32m'
-readonly Yellow='\033[0;33m'
-readonly Blue='\033[0;34m'
-readonly Purple='\033[0;35m'
-readonly Cyan='\033[0;36m'
-readonly White='\033[0;37m'
+readonly Black="${NC}\033[0;30m"
+readonly Red="${NC}\033[0;31m"
+readonly Green="${NC}\033[0;32m"
+readonly Yellow="${NC}\033[0;33m"
+readonly Blue="${NC}\033[0;34m"
+readonly Purple="${NC}\033[0;35m"
+readonly Cyan="${NC}\033[0;36m"
+readonly White="${NC}\033[0;37m"
 
 # Bold
-readonly BBlack='\033[1;30m'
-readonly BRed='\033[1;31m'
-readonly BGreen='\033[1;32m'
-readonly BYellow='\033[1;33m'
-readonly BBlue='\033[1;34m'
-readonly BPurple='\033[1;35m'
-readonly BCyan='\033[1;36m'
-readonly BWhite='\033[1;37m'
+readonly BBlack="${NC}\033[1;30m"
+readonly BRed="${NC}\033[1;31m"
+readonly BGreen="${NC}\033[1;32m"
+readonly BYellow="${NC}\033[1;33m"
+readonly BBlue="${NC}\033[1;34m"
+readonly BPurple="${NC}\033[1;35m"
+readonly BCyan="${NC}\033[1;36m"
+readonly BWhite="${NC}\033[1;37m"
 
 # High Intensity
-readonly IBlack='\033[0;90m'
-readonly IRed='\033[0;91m'
-readonly IGreen='\033[0;92m'
-readonly IYellow='\033[0;93m'
-readonly IBlue='\033[0;94m'
-readonly IPurple='\033[0;95m'
-readonly ICyan='\033[0;96m'
-readonly IWhite='\033[0;97m'
+readonly IBlack="${NC}\033[0;90m"
+readonly IRed="${NC}\033[0;91m"
+readonly IGreen="${NC}\033[0;92m"
+readonly IYellow="${NC}\033[0;93m"
+readonly IBlue="${NC}\033[0;94m"
+readonly IPurple="${NC}\033[0;95m"
+readonly ICyan="${NC}\033[0;96m"
+readonly IWhite="${NC}\033[0;97m"
 
 # Bold High Intensity
-readonly BIBlack='\033[1;90m'
-readonly BIRed='\033[1;91m'
-readonly BIGreen='\033[1;92m'
-readonly BIYellow='\033[1;93m'
-readonly BIBlue='\033[1;94m'
-readonly BIPurple='\033[1;95m'
-readonly BICyan='\033[1;96m'
-readonly BIWhite='\033[1;97m'
+readonly BIBlack="${NC}\033[1;90m"
+readonly BIRed="${NC}\033[1;91m"
+readonly BIGreen="${NC}\033[1;92m"
+readonly BIYellow="${NC}\033[1;93m"
+readonly BIBlue="${NC}\033[1;94m"
+readonly BIPurple="${NC}\033[1;95m"
+readonly BICyan="${NC}\033[1;96m"
+readonly BIWhite="${NC}\033[1;97m"
 
 # ── 1. General Logging Utilities ──────────────────────────────────────────────
 log() { echo -e "$(date '+%F %T') | ${*}" >&2; }
@@ -70,10 +70,10 @@ fatal() {
 debug() { echo -e "\n${BIYellow}[DEBUG] ${*}${NC}" >&2; }
 
 # ── 2. UI & Formatting Helpers ────────────────────────────────────────────────
-newline() { printf '\n' >&2; }
 title() { echo -e "${BICyan}${*}${NC}" >&2; }
 subtitle() { echo -e "${BBlue}${*}${NC}" >&2; }
 label() { echo -e "${IWhite}${*}${NC}"; }
+newline() { printf '\n' >&2; }
 header() {
 	echo -e "${BIBlue}
   ###########################################################
