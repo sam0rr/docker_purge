@@ -27,7 +27,7 @@ Choose one of the following methods:
 *Downloads and executes the script without saving it locally.*
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/sam0rr/DOCKER-PURGE/main/docker_purge.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash
 ```
 
 ### 2. Install as a system command
@@ -83,7 +83,7 @@ EXAMPLES:
   docker-purge --force --no-confirm
 
   # Run via curl (piped)
-  curl -fsSL https://raw.githubusercontent.com/sam0rr/DOCKER-PURGE/main/docker_purge.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh | bash
 ```
 
 ## Arguments

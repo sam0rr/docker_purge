@@ -9,13 +9,14 @@
 # * Supports: --force (Stop ALL running containers before purging)
 ################################################################################
 
-# ---- Configuration -----------------------------------------------------------
+# Configuration
 readonly APP_NAME="DOCKER PURGE"
+readonly GITHUB_URL="https://raw.githubusercontent.com/sam0rr/docker_purge/main/docker_purge.sh"
 
-# ---- Color definitions -------------------------------------------------------
+# Safe terminal tput command
 _tput() { command -v tput >/dev/null 2>&1 && tput "$@" 2>/dev/null; }
 
-# Only define colors if the terminal supports them
+# Initialize color variables
 if [[ $(_tput colors) -ge 8 ]]; then
 	readonly NC=$(_tput sgr0)
 	readonly BOLD=$(_tput bold)
@@ -60,6 +61,7 @@ if [[ $(_tput colors) -ge 8 ]]; then
 	readonly BICyan="${NC}${BOLD}$(_tput setaf 14)"
 	readonly BIWhite="${NC}${BOLD}$(_tput setaf 15)"
 else
+	# Fallback to no formatting if colors are not supported
 	readonly NC='' BOLD=''
 	readonly Black='' Red='' Green='' Yellow='' Blue='' Purple='' Cyan='' White=''
 	readonly BBlack='' BRed='' BGreen='' BYellow='' BBlue='' BPurple='' BCyan='' BWhite=''
@@ -67,7 +69,7 @@ else
 	readonly BIBlack='' BIRed='' BIGreen='' BIYellow='' BIBlue='' BIPurple='' BICyan='' BIWhite=''
 fi
 
-# ---- Logging helpers -------------------------------------------------------------
+# Logging helpers
 log() { echo -e "$(date '+%F %T') | ${*}" >&2; }
 info() { echo -e "${IBlue}${*}${NC}" >&2; }
 success() { echo -e "${BGreen}${*}${NC}" >&2; }
@@ -79,7 +81,7 @@ fatal() {
 }
 debug() { echo -e "\n${BIYellow}[DEBUG] ${*}${NC}" >&2; }
 
-# ---- Formatting helpers -------------------------------------------------------------
+# Formatting helpers
 title() { echo -e "${BICyan}${*}${NC}" >&2; }
 subtitle() { echo -e "${BBlue}${*}${NC}" >&2; }
 label() { echo -e "${IWhite}${*}${NC}"; }
@@ -96,7 +98,7 @@ bullet_warn() { echo -e "   ${BIRed}• ${*}${NC}" >&2; }
 option() { printf "  ${Cyan}%-18s${NC} ${IWhite}%s${NC}\n" "${1}" "${2}" >&2; }
 key_value() { printf "   ${IWhite}%-18s${NC} %b\n" "${1}" "${2}" >&2; }
 
-# ---- format_bytes ------------------------------------------------------------
+# Convert byte values into human-readable strings (KB, MB, GB, etc.)
 format_bytes() {
 	echo "${1}" | awk '{
         split("B KB MB GB TB PB", unit, " ");
@@ -109,7 +111,7 @@ format_bytes() {
     }'
 }
 
-# ---- show_help ---------------------------------------------------------------
+# Display the application usage guide and help message
 show_help() {
 	header "${APP_NAME} — Usage Guide"
 	subtitle "USAGE:"
@@ -127,12 +129,12 @@ show_help() {
 	info "# Hard reset (Stop all and purge without asking)"
 	label "  docker-purge --force --no-confirm"
 	newline
-	info "# ---- Run via curl (piped) -----------------------------------------------------"
-	label "  curl -fsSL https://raw.githubusercontent.com/sam0rr/DOCKER-PURGE/main/docker_purge.sh | bash"
+	info "# Run the script directly from GitHub via curl"
+	label "  curl -fsSL ${GITHUB_URL} | bash"
 	newline
 }
 
-# ---- validate_requirements ---------------------------------------------------
+# Validate required dependencies
 validate_requirements() {
 	if ! command -v docker >/dev/null 2>&1; then
 		fatal "Docker is not installed. Please install Docker first."
@@ -143,7 +145,7 @@ validate_requirements() {
 	fi
 }
 
-# ---- get_docker_usage --------------------------------------------------------
+# Calculate the total disk usage of all Docker resources in bytes
 get_docker_usage() {
 	docker system df --format "{{.Size}}" | awk '
         function to_bytes(s) {
@@ -159,7 +161,7 @@ get_docker_usage() {
     '
 }
 
-# ---- confirm_purge -----------------------------------------------------------
+# Ask for user confirmation
 confirm_purge() {
 	local no_confirm="${1}"
 	local force_mode="${2}"
@@ -194,7 +196,7 @@ confirm_purge() {
 	done
 }
 
-# ---- perform_cleanup ---------------------------------------------------------
+# Perform Docker cleanup and pruning operations
 perform_cleanup() {
 	local force_mode="${1}"
 	subtitle "Cleanup Operations"
@@ -227,7 +229,7 @@ perform_cleanup() {
 	docker system prune --all --volumes --force >/dev/null
 }
 
-# ---- display_summary ---------------------------------------------------------
+# Display a summary report
 display_summary() {
 	local initial_raw="${1}"
 	local final_raw="${2}"
@@ -250,7 +252,7 @@ display_summary() {
 	subtitle "==========================================================="
 }
 
-# ---- main --------------------------------------------------------------------
+#  main
 main() {
 	local no_confirm=false
 	local force_mode=false
@@ -294,7 +296,7 @@ main() {
 	exit 0
 }
 
-# ---- Trap & Execute ----------------------------------------------------------
+# Trap & Execute
 trap 'newline; warning "Process interrupted."; exit 1' INT
 
 main "${@}"
