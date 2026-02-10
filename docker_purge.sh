@@ -77,70 +77,70 @@ fi
 # Logging helpers
 newline() { printf '\n' >&2; }
 log() {
-	printf "$(date '+%F %T') | %b" "${*}" >&2
+	printf "%s | %b" "$(date '+%F %T')" "${*}" >&2
 	newline
 }
 info() {
-	printf "${IBlue}%b${NC}" "${*}" >&2
+	printf "%b%b%b" "${IBlue}" "${*}" "${NC}" >&2
 	newline
 }
 success() {
-	printf "${BGreen}%b${NC}" "${*}" >&2
+	printf "%b%b%b" "${BGreen}" "${*}" "${NC}" >&2
 	newline
 }
 warning() {
-	printf "${BYellow}%b${NC}" "${*}" >&2
+	printf "%b%b%b" "${BYellow}" "${*}" "${NC}" >&2
 	newline
 }
 error() {
-	printf "${BRed}[ERROR] %b${NC}" "${*}" >&2
+	printf "%b[ERROR] %b%b" "${BRed}" "${*}" "${NC}" >&2
 	newline
 }
 fatal() {
-	printf "${BIRed}[FATAL] %b${NC}" "${*}" >&2
+	printf "%b[FATAL] %b%b" "${BIRed}" "${*}" "${NC}" >&2
 	newline
 	exit 1
 }
 debug() {
-	printf "${BIYellow}[DEBUG] %b${NC}" "${*}" >&2
+	printf "%b[DEBUG] %b%b" "${BIYellow}" "${*}" "${NC}" >&2
 	newline
 }
 
 # Formatting helpers
 title() {
-	printf "${BICyan}%b${NC}" "${*}" >&2
+	printf "%b%b%b" "${BICyan}" "${*}" "${NC}" >&2
 	newline
 }
 subtitle() {
-	printf "${BBlue}%b${NC}" "${*}" >&2
+	printf "%b%b%b" "${BBlue}" "${*}" "${NC}" >&2
 	newline
 }
 label() {
-	printf "${IWhite}%b${NC}" "${*}" >&2
+	printf "%b%b%b" "${IWhite}" "${*}" "${NC}" >&2
 	newline
 }
 header() {
-	printf "${BIBlue}
+	printf "%b
   ###########################################################
   # %b
   ###########################################################
-  ${NC}" "${*}" >&2
+  %b" "${BIBlue}" "${*}" "${NC}" >&2
 	newline
 }
 bullet() {
-	printf "   ${Red}•${NC} ${IWhite}%b${NC}" "${*}" >&2
+	printf "   %b•%b %b%b%b" "${Red}" "${NC}" "${IWhite}" "${*}" "${NC}" >&2
 	newline
 }
 bullet_warn() {
-	printf "   ${BIRed}• %b${NC}" "${*}" >&2
+	printf "   %b• %b%b" "${BIRed}" "${*}" "${NC}" >&2
 	newline
 }
 option() {
-	printf "  ${Cyan}%-18s${NC} ${IWhite}%s${NC}" "${1}" "${2}" >&2
+	printf "  %b%-18s%b %b%s%b" "${Cyan}" "${1}" "${NC}" "${IWhite}" "${2}" "${NC}" >&2
 	newline
 }
 key_value() {
-	printf "   ${IWhite}%-18s${NC} %b" "${1}" "${2}" >&2
+	printf "   %b%-18s%b %b" "${IWhite}" "${1}" "${NC}" "${2}" >&2
 	newline
 }
 
@@ -173,7 +173,7 @@ show_help() {
 # Parse command-line arguments and set flags
 parse_args() {
 	for arg in "${@}"; do
-		case ${arg} in
+		case "${arg}" in
 		-h | --help)
 			show_help
 			exit 0
@@ -195,13 +195,11 @@ validate_requirements() {
 	if ! command -v docker >/dev/null 2>&1; then
 		newline
 		fatal "Docker is not installed. Please install Docker first."
-		newline
 	fi
 
 	if ! docker info >/dev/null 2>&1; then
 		newline
 		fatal "Cannot connect to Docker daemon. Is it running?"
-		newline
 	fi
 }
 
@@ -259,7 +257,7 @@ confirm_purge() {
 	newline
 
 	while true; do
-		printf "${BYellow}Do you want to proceed? (y/N): ${NC}" >&2
+		printf "%bDo you want to proceed? (y/N): %b" "${BYellow}" "${NC}" >&2
 		read -r choice </dev/tty
 		choice=$(printf "%s" "${choice}" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
 
@@ -318,9 +316,8 @@ display_summary() {
 	local initial_raw="${1}"
 	local final_raw="${2}"
 	local saved_raw=$((initial_raw - final_raw))
-	[[ ${saved_raw} -lt 0 ]] && saved_raw=0
+	[[ "${saved_raw}" -lt 0 ]] && saved_raw=0
 
-	newline
 	header "${APP_NAME} SUMMARY REPORT"
 
 	subtitle "Space Analysis"
@@ -330,7 +327,7 @@ display_summary() {
 	newline
 
 	subtitle "Health Assessment"
-	printf "   ${IWhite}%-18s${NC} " "Status" >&2
+	printf "   %b%-18s%b " "${IWhite}" "Status" "${NC}" >&2
 	success "Docker environment optimized and clean"
 	newline
 }
@@ -342,23 +339,26 @@ main() {
 
 	parse_args "${@}"
 
-	newline
 	header "${APP_NAME} - Optimization Tool"
 
 	validate_requirements
 
 	info "Analyzing Docker disk usage..."
-	local initial_usage=$(get_docker_usage)
+	local initial_usage
+	initial_usage=$(get_docker_usage)
 
 	if confirm_purge "${no_confirm}" "${force_mode}"; then
 		newline
 		perform_cleanup "${force_mode}"
 
+		newline
 		info "Analyzing final usage..."
-		local final_usage=$(get_docker_usage)
+		local final_usage
+		final_usage=$(get_docker_usage)
 
 		display_summary "${initial_usage}" "${final_usage}"
 		success "Operation completed successfully"
+		newline
 	fi
 
 	exit 0
