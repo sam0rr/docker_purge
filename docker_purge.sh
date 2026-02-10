@@ -288,7 +288,6 @@ perform_cleanup() {
 		running_containers=$(docker ps -q)
 		if [[ -n "${running_containers}" ]]; then
 			info "-> Stopping all running containers..."
-			# shellcheck disable=SC2086
 			docker stop ${running_containers} >/dev/null
 		else
 			info "-> No containers running."
